@@ -45,15 +45,16 @@ where
     }
 }
 
-impl<E> AsRef<str> for CryptString<E> {
+impl<E, C: StrWraper> AsRef<str> for CryptString<E, C> {
     fn as_ref(&self) -> &str {
         match self {
-            CryptString::Raw(r, _) | CryptString::Crypt(r) => &r,
+            CryptString::Raw(r, _) => r.into_ref(),
+            CryptString::Crypt(r) => &r,
         }
     }
 }
 
-impl<E> Deref for CryptString<E> {
+impl<E, C: StrWraper> Deref for CryptString<E, C> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -62,8 +63,8 @@ impl<E> Deref for CryptString<E> {
 }
 
 #[cfg(feature = "wrap")]
-impl<E> CryptString<E> {
-    pub fn into_crypt(self) -> crate::CryptWarp<crate::Crypt, E> {
+impl<E, C: StrWraper> CryptString<E, C> {
+    pub fn into_crypt(self) -> crate::CryptWarp<crate::Crypt, E, C> {
         crate::CryptWarp(crate::Crypt, self)
     }
 }

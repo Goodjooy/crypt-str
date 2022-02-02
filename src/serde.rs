@@ -4,13 +4,15 @@ use serde_::de;
 
 use crate::{
     crypt::CryptString,
+    str_wraper::StrWraper,
     wrap::{Crypt, CryptWarp, Raw},
     Encoder,
 };
 
-impl<'de, E> serde_::Deserialize<'de> for CryptWarp<Raw, E>
+impl<'de, E, C> serde_::Deserialize<'de> for CryptWarp<Raw, E, C>
 where
     E: Encoder + Default,
+    C: StrWraper,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -24,9 +26,10 @@ where
     }
 }
 
-impl<'de, E> serde_::Deserialize<'de> for CryptWarp<Crypt, E>
+impl<'de, E, C> serde_::Deserialize<'de> for CryptWarp<Crypt, E, C>
 where
     E: Encoder + Default,
+    C: StrWraper,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -37,9 +40,10 @@ where
     }
 }
 
-impl<E> serde_::Serialize for CryptWarp<Crypt, E>
+impl<E, C> serde_::Serialize for CryptWarp<Crypt, E, C>
 where
     E: Encoder,
+    C: StrWraper,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -47,7 +51,7 @@ where
     {
         let crypt = match &self.1 {
             CryptString::Raw(r, _) => {
-                E::encode(&r).or_else(|e| Err(serde_::ser::Error::custom(e)))?
+                E::encode(&r.into_ref()).or_else(|e| Err(serde_::ser::Error::custom(e)))?
             }
             CryptString::Crypt(r) => Cow::Borrowed(r.deref()),
         };
