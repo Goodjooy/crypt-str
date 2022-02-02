@@ -1,26 +1,26 @@
 use std::borrow::Cow;
 
-use crate::{Crypto, CryptoString, CryptoWarp, Encoder, Raw};
+use crate::{Crypt, CryptString, CryptWarp, Encoder, Raw};
 
-impl<E> From<String> for CryptoWarp<Raw, E>
+impl<E> From<String> for CryptWarp<Raw, E>
 where
     E: Encoder + Default,
 {
     fn from(s: String) -> Self {
-        CryptoWarp(Raw, CryptoString::new_raw(s))
+        CryptWarp(Raw, CryptString::new_raw(s))
     }
 }
 
-impl<E> From<String> for CryptoWarp<Crypto, E>
+impl<E> From<String> for CryptWarp<Crypt, E>
 where
     E: Encoder + Default,
 {
     fn from(s: String) -> Self {
-        CryptoWarp(Crypto, CryptoString::new_crypto(s))
+        CryptWarp(Crypt, CryptString::new_crypt(s))
     }
 }
 
-impl<'s, E> TryInto<Cow<'s, str>> for &'s CryptoWarp<Crypto, E>
+impl<'s, E> TryInto<Cow<'s, str>> for &'s CryptWarp<Crypt, E>
 where
     E: Encoder,
 {
@@ -28,8 +28,8 @@ where
 
     fn try_into(self) -> Result<Cow<'s, str>, Self::Error> {
         match &self.1 {
-            CryptoString::Raw(r, _) => E::encode(Cow::Borrowed(r)),
-            CryptoString::Crypto(c) => Ok(Cow::Borrowed(&c)),
+            CryptString::Raw(r, _) => E::encode(Cow::Borrowed(r)),
+            CryptString::Crypt(c) => Ok(Cow::Borrowed(&c)),
         }
     }
 }

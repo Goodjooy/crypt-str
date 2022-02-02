@@ -1,4 +1,4 @@
-mod crypto;
+mod crypt;
 mod encoders;
 #[cfg(feature = "serde")]
 mod serde;
@@ -13,17 +13,17 @@ pub mod inner_encoders {
     pub mod bcrypt {
         pub use crate::encoders::bcrypt::BcryptEncoder;
         pub type DefaultBcryptEncoder = BcryptEncoder<12>;
-        pub type BcryptString = crate::CryptoString<DefaultBcryptEncoder>;
+        pub type BcryptString = crate::CryptString<DefaultBcryptEncoder>;
     }
 
     #[cfg(feature = "none")]
     pub mod none {
         pub use crate::encoders::none::{NoCrypto, NoErr};
-        pub type NoCrtpyoString = crate::CryptoString<NoCrypto>;
+        pub type NoCrtpyoString = crate::CryptString<NoCrypto>;
     }
 }
 
-pub use crypto::CryptoString;
+pub use crypt::CryptString;
 
 #[cfg(feature = "wrap")]
-pub use wrap::{Crypto, CryptoWarp, Raw};
+pub use wrap::{Crypt, CryptWarp, Raw};

@@ -3,12 +3,12 @@ use std::{borrow::Cow, ops::Deref};
 use crate::Encoder;
 
 #[derive(Debug, Clone)]
-pub enum CryptoString<E> {
+pub enum CryptString<E> {
     Raw(Cow<'static, str>, E),
-    Crypto(Cow<'static, str>),
+    Crypt(Cow<'static, str>),
 }
 
-impl<E> CryptoString<E>
+impl<E> CryptString<E>
 where
     E: Encoder,
 {
@@ -20,16 +20,16 @@ where
         Self::Raw(Cow::Owned(raw.into()), E::default())
     }
 
-    pub fn new_crypto<S>(raw: S) -> Self
+    pub fn new_crypt<S>(raw: S) -> Self
     where
         S: Into<String>,
     {
-        Self::Crypto(Cow::Owned(raw.into()))
+        Self::Crypt(Cow::Owned(raw.into()))
     }
 
-    pub fn crypto(self) -> Result<Self, E::Error> {
+    pub fn crypt(self) -> Result<Self, E::Error> {
         match self {
-            CryptoString::Raw(r, _) => E::encode(r).and_then(|e| Ok(Self::Crypto(e))),
+            CryptString::Raw(r, _) => E::encode(r).and_then(|e| Ok(Self::Crypt(e))),
             c => Ok(c),
         }
     }
@@ -37,22 +37,22 @@ where
     pub fn verify(&self, rhs: &Self) -> std::result::Result<bool, E::Error> {
         match (self, rhs) {
             (Self::Raw(r, _), Self::Raw(r2, _)) => Ok(r == r2),
-            (Self::Raw(r, _), Self::Crypto(c)) => E::verify(c, r),
-            (Self::Crypto(c), Self::Raw(r, _)) => E::verify(c, r),
-            (Self::Crypto(c1), Self::Crypto(c2)) => Ok(c1 == c2),
+            (Self::Raw(r, _), Self::Crypt(c)) => E::verify(c, r),
+            (Self::Crypt(c), Self::Raw(r, _)) => E::verify(c, r),
+            (Self::Crypt(c1), Self::Crypt(c2)) => Ok(c1 == c2),
         }
     }
 }
 
-impl<E> AsRef<str> for CryptoString<E> {
+impl<E> AsRef<str> for CryptString<E> {
     fn as_ref(&self) -> &str {
         match self {
-            CryptoString::Raw(r, _) | CryptoString::Crypto(r) => &r,
+            CryptString::Raw(r, _) | CryptString::Crypt(r) => &r,
         }
     }
 }
 
-impl<E> Deref for CryptoString<E> {
+impl<E> Deref for CryptString<E> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -61,8 +61,8 @@ impl<E> Deref for CryptoString<E> {
 }
 
 #[cfg(feature = "wrap")]
-impl<E> CryptoString<E> {
-    pub fn into_crypto(self) -> crate::CryptoWarp<crate::Crypto, E> {
-        crate::CryptoWarp(crate::Crypto, self)
+impl<E> CryptString<E> {
+    pub fn into_crypt(self) -> crate::CryptWarp<crate::Crypt, E> {
+        crate::CryptWarp(crate::Crypt, self)
     }
 }

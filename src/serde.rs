@@ -1,12 +1,12 @@
 use std::{borrow::Cow, ops::Deref};
 
 use crate::{
-    crypto::CryptoString,
-    wrap::{Crypto, CryptoWarp, Raw},
+    crypt::CryptString,
+    wrap::{Crypt, CryptWarp, Raw},
     Encoder,
 };
 
-impl<'de, E> serde_::Deserialize<'de> for CryptoWarp<Raw, E>
+impl<'de, E> serde_::Deserialize<'de> for CryptWarp<Raw, E>
 where
     E: Encoder + Default,
 {
@@ -15,11 +15,11 @@ where
         D: serde_::Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Self(Raw, CryptoString::new_raw(s)))
+        Ok(Self(Raw, CryptString::new_raw(s)))
     }
 }
 
-impl<'de, E> serde_::Deserialize<'de> for CryptoWarp<Crypto, E>
+impl<'de, E> serde_::Deserialize<'de> for CryptWarp<Crypt, E>
 where
     E: Encoder + Default,
 {
@@ -28,11 +28,11 @@ where
         D: serde_::Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Self(Crypto, CryptoString::new_crypto(s)))
+        Ok(Self(Crypt, CryptString::new_crypt(s)))
     }
 }
 
-impl<E> serde_::Serialize for CryptoWarp<Crypto, E>
+impl<E> serde_::Serialize for CryptWarp<Crypt, E>
 where
     E: Encoder,
 {
@@ -41,10 +41,10 @@ where
         S: serde_::Serializer,
     {
         let crypt = match &self.1 {
-            CryptoString::Raw(r, _) => {
+            CryptString::Raw(r, _) => {
                 E::encode(Cow::Borrowed(r)).or_else(|e| Err(serde_::ser::Error::custom(e)))?
             }
-            CryptoString::Crypto(r) => Cow::Borrowed(r.deref()),
+            CryptString::Crypt(r) => Cow::Borrowed(r.deref()),
         };
 
         crypt.serialize(serializer)
