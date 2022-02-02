@@ -3,8 +3,8 @@ use std::{borrow::Cow, ops::Deref};
 use crate::Encoder;
 
 #[derive(Debug, Clone)]
-pub enum CryptString<E> {
-    Raw(Cow<'static, str>, E),
+pub enum CryptString<E, C = Cow<'static, str>> {
+    Raw(C, E),
     Crypt(Cow<'static, str>),
 }
 

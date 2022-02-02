@@ -1,3 +1,4 @@
+pub mod str_wraper;
 mod crypt;
 mod encoders;
 #[cfg(feature = "serde")]
