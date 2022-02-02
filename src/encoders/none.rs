@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use crate::Encoder;
 
 pub struct NoCrypto;
@@ -7,8 +5,8 @@ pub struct NoCrypto;
 impl Encoder for NoCrypto {
     type Error = NoErr;
 
-    fn encode<'s>(raw: Cow<'s,str>) -> Result<std::borrow::Cow<'s, str>, Self::Error> {
-        Ok(raw)
+    fn encode<'s>(raw: &str) -> Result<std::borrow::Cow<'s, str>, Self::Error> {
+        Ok(raw.to_owned().into())
     }
 
     fn verify<'s, S: AsRef<str>>(

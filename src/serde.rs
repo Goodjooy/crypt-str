@@ -1,5 +1,7 @@
 use std::{borrow::Cow, ops::Deref};
 
+use serde_::de;
+
 use crate::{
     crypt::CryptString,
     wrap::{Crypt, CryptWarp, Raw},
@@ -15,7 +17,10 @@ where
         D: serde_::Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Self(Raw, CryptString::new_raw(s)))
+        Ok(Self(
+            Raw,
+            CryptString::new_raw(s).or_else(|e| Err(de::Error::custom(e)))?,
+        ))
     }
 }
 
@@ -42,7 +47,7 @@ where
     {
         let crypt = match &self.1 {
             CryptString::Raw(r, _) => {
-                E::encode(Cow::Borrowed(r)).or_else(|e| Err(serde_::ser::Error::custom(e)))?
+                E::encode(&r).or_else(|e| Err(serde_::ser::Error::custom(e)))?
             }
             CryptString::Crypt(r) => Cow::Borrowed(r.deref()),
         };
@@ -50,5 +55,3 @@ where
         crypt.serialize(serializer)
     }
 }
-
-

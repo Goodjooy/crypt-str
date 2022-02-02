@@ -1,6 +1,6 @@
 use std::{borrow::Cow, ops::Deref};
 
-use crate::Encoder;
+use crate::{str_wraper::StrWraper, Encoder};
 
 #[derive(Debug, Clone)]
 pub enum CryptString<E, C = Cow<'static, str>> {
@@ -8,16 +8,17 @@ pub enum CryptString<E, C = Cow<'static, str>> {
     Crypt(Cow<'static, str>),
 }
 
-impl<E> CryptString<E>
+impl<E, C> CryptString<E, C>
 where
     E: Encoder,
+    C: StrWraper,
 {
-    pub fn new_raw<S>(raw: S) -> Self
+    pub fn new_raw<S>(raw: S) -> Result<Self, C::Error>
     where
         E: Default,
         S: Into<String>,
     {
-        Self::Raw(Cow::Owned(raw.into()), E::default())
+        Ok(Self::Raw(C::from_owner(raw.into())?, E::default()))
     }
 
     pub fn new_crypt<S>(raw: S) -> Self
@@ -29,16 +30,16 @@ where
 
     pub fn crypt(self) -> Result<Self, E::Error> {
         match self {
-            CryptString::Raw(r, _) => E::encode(r).and_then(|e| Ok(Self::Crypt(e))),
+            CryptString::Raw(r, _) => E::encode(&r.into_ref()).and_then(|e| Ok(Self::Crypt(e))),
             c => Ok(c),
         }
     }
 
     pub fn verify(&self, rhs: &Self) -> std::result::Result<bool, E::Error> {
         match (self, rhs) {
-            (Self::Raw(r, _), Self::Raw(r2, _)) => Ok(r == r2),
-            (Self::Raw(r, _), Self::Crypt(c)) => E::verify(c, r),
-            (Self::Crypt(c), Self::Raw(r, _)) => E::verify(c, r),
+            (Self::Raw(r, _), Self::Raw(r2, _)) => Ok(r.into_ref() == r2.into_ref()),
+            (Self::Raw(r, _), Self::Crypt(c)) => E::verify(c, &r.into_ref()),
+            (Self::Crypt(c), Self::Raw(r, _)) => E::verify(c, &r.into_ref()),
             (Self::Crypt(c1), Self::Crypt(c2)) => Ok(c1 == c2),
         }
     }
