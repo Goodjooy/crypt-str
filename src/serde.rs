@@ -4,7 +4,7 @@ use serde_::de;
 
 use crate::{
     crypt::CryptString,
-    str_wraper::StrWraper,
+    str_wrapper::StrWrapper,
     wrap::{Crypt, CryptWarp, Raw},
     Encoder,
 };
@@ -12,7 +12,7 @@ use crate::{
 impl<'de, E, C> serde_::Deserialize<'de> for CryptWarp<Raw, E, C>
 where
     E: Encoder + Default,
-    C: StrWraper,
+    C: StrWrapper,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -29,7 +29,7 @@ where
 impl<'de, E, C> serde_::Deserialize<'de> for CryptWarp<Crypt, E, C>
 where
     E: Encoder + Default,
-    C: StrWraper,
+    C: StrWrapper,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -43,7 +43,7 @@ where
 impl<E, C> serde_::Serialize for CryptWarp<Crypt, E, C>
 where
     E: Encoder,
-    C: StrWraper,
+    C: StrWrapper,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

@@ -12,7 +12,7 @@ impl std::fmt::Display for NoError {
 impl std::error::Error for NoError {}
 
 /// `CryptString` 内部的str容器
-pub trait StrWraper: Sized {
+pub trait StrWrapper: Sized {
     /// 当包装时，可能会产生错误，此处为错误关联类型
     type Error: std::error::Error;
     /// 从容器中获取引用
@@ -23,7 +23,7 @@ pub trait StrWraper: Sized {
 
 
 
-impl StrWraper for String {
+impl StrWrapper for String {
     fn into_ref(&self) -> &str {
         self.as_str()
     }
@@ -35,7 +35,7 @@ impl StrWraper for String {
     type Error = NoError;
 }
 
-impl<'s> StrWraper for Cow<'s, str> {
+impl<'s> StrWrapper for Cow<'s, str> {
     fn into_ref(&self) -> &str {
         &*self
     }
@@ -47,7 +47,7 @@ impl<'s> StrWraper for Cow<'s, str> {
     type Error = NoError;
 }
 
-impl<'s> StrWraper for Box<String> {
+impl<'s> StrWrapper for Box<String> {
     type Error = NoError;
 
     fn into_ref(&self) -> &str {

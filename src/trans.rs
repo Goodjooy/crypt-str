@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
-use crate::{str_wraper::StrWraper, Crypt, CryptString, CryptWarp, Encoder, Raw};
+use crate::{str_wrapper::StrWrapper, Crypt, CryptString, CryptWarp, Encoder, Raw};
 
 impl<E, C> TryFrom<String> for CryptWarp<Raw, E, C>
 where
     E: Encoder + Default,
-    C: StrWraper,
+    C: StrWrapper,
 {
     type Error = C::Error;
     fn try_from(s: String) -> Result<Self, Self::Error> {
@@ -16,7 +16,7 @@ where
 impl<E, C> From<String> for CryptWarp<Crypt, E, C>
 where
     E: Encoder + Default,
-    C: StrWraper,
+    C: StrWrapper,
 {
     fn from(s: String) -> Self {
         CryptWarp(Crypt, CryptString::new_crypt(s))
@@ -26,7 +26,7 @@ where
 impl<'s, E, C> TryInto<Cow<'s, str>> for &'s CryptWarp<Crypt, E, C>
 where
     E: Encoder,
-    C: StrWraper,
+    C: StrWrapper,
 {
     type Error = E::Error;
 

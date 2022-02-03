@@ -1,6 +1,6 @@
 use std::{borrow::Cow, ops::Deref};
 
-use crate::{str_wraper::StrWraper, Encoder};
+use crate::{str_wrapper::StrWrapper, Encoder};
 
 #[derive(Debug, Clone)]
 pub enum CryptString<E, C = Cow<'static, str>> {
@@ -11,7 +11,7 @@ pub enum CryptString<E, C = Cow<'static, str>> {
 impl<E, C> CryptString<E, C>
 where
     E: Encoder,
-    C: StrWraper,
+    C: StrWrapper,
 {
     pub fn new_raw<S>(raw: S) -> Result<Self, C::Error>
     where
@@ -45,7 +45,7 @@ where
     }
 }
 
-impl<E, C: StrWraper> AsRef<str> for CryptString<E, C> {
+impl<E, C: StrWrapper> AsRef<str> for CryptString<E, C> {
     fn as_ref(&self) -> &str {
         match self {
             CryptString::Raw(r, _) => r.into_ref(),
@@ -54,7 +54,7 @@ impl<E, C: StrWraper> AsRef<str> for CryptString<E, C> {
     }
 }
 
-impl<E, C: StrWraper> Deref for CryptString<E, C> {
+impl<E, C: StrWrapper> Deref for CryptString<E, C> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -63,7 +63,7 @@ impl<E, C: StrWraper> Deref for CryptString<E, C> {
 }
 
 #[cfg(feature = "wrap")]
-impl<E, C: StrWraper> CryptString<E, C> {
+impl<E, C: StrWrapper> CryptString<E, C> {
     pub fn into_crypt(self) -> crate::CryptWarp<crate::Crypt, E, C> {
         crate::CryptWarp(crate::Crypt, self)
     }

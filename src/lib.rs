@@ -5,7 +5,7 @@
 //! - none 提供内置不加密 Encoder
 //! - serde 提供序列化与反序列化支持
 //! - tarns 提供 `String` 与 `CryptString` 互相转换实现支持
-//! - warp 使得 `crate::CryptWrap` 可用
+//! - wrap 使得 `crate::CryptWrap` 可用
 //!  
 //! ---
 //! 
@@ -16,7 +16,7 @@
 //! 
 //! ## 可更改的原文容器
 //! 通过 指定 `StrWrapper` 为crypt String 更换默认原文容器
-//! 默认为 `Cow<'static, str>`
+//! 默认为 `Cow<'static, str>`  
 //! `StrWrapper` 自动为 `Cow<'s, str>`与 `String` 实现
 //! 可以实现 其他容器用于存放原文 
 //! 
@@ -29,7 +29,7 @@ mod crypt;
 mod encoders;
 #[cfg(feature = "serde")]
 mod serde;
-mod str_wraper;
+mod str_wrapper;
 #[cfg(feature = "trans")]
 mod trans;
 #[cfg(feature = "wrap")]
@@ -48,11 +48,11 @@ pub mod inner_encoders {
     #[cfg(feature = "none")]
     pub mod none {
         pub use crate::encoders::none::{NoCrypto, NoErr};
-        pub type NoCrtpyoString = crate::CryptString<NoCrypto>;
+        pub type NoCryptString = crate::CryptString<NoCrypto>;
     }
 }
 
-pub use crate::str_wraper::{NoError, StrWraper};
+pub use crate::str_wrapper::{NoError, StrWrapper};
 pub use crypt::CryptString;
 #[cfg(feature = "wrap")]
 pub use wrap::{Crypt, CryptWarp, Raw};
